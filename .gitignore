@@ -1,2 +1,6 @@
 
 \.idea/
+
+algo_learn/__pycache__/
+
+*.pyc

@@ -4,13 +4,12 @@ from .models import Person, Algorithm, Problem, Student, Teacher, Group, Order, 
 from django.http import HttpResponseRedirect, HttpResponseNotFound, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from untitled.settings import BASE_DIR
+from main.settings import BASE_DIR
 import datetime
 import sqlite3
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import ttfonts, pdfmetrics
 from reportlab.lib.colors import red, black, green
-
 
 ALL_TASKS = ['Сортировка пузырьком', 'Сортировка вставками']
 
@@ -104,7 +103,7 @@ def createsolving(request, pr_id):
         Stu.st_rate += res
         tom.save()
         Stu.save()
-    return HttpResponseRedirect ('/'.join(request.path.split('/')[:-4]))
+    return HttpResponseRedirect('/'.join(request.path.split('/')[:-4]))
 
 
 def report1(request):
@@ -112,7 +111,8 @@ def report1(request):
     resp['Content_Disposition'] = 'attachment; filename="somefilename.pdf"'
     base = sqlite3.connect("db.sqlite3")
     cur = base.cursor()
-    cur.execute("Select gr_name, count(Distinct student_id) AS 'Количество студентов', count(Distinct pr_id) as 'Количество заданий' from (algo_learn_problem A inner join algo_learn_group B on A.pr_group_id = B.gr_id) С inner join algo_learn_group_gr_students D on gr_id = group_id Group by gr_name Order By count(Distinct pr_id) DESC ")
+    cur.execute(
+        "Select gr_name, count(Distinct student_id) AS 'Количество студентов', count(Distinct pr_id) as 'Количество заданий' from (algo_learn_problem A inner join algo_learn_group B on A.pr_group_id = B.gr_id) С inner join algo_learn_group_gr_students D on gr_id = group_id Group by gr_name Order By count(Distinct pr_id) DESC ")
     res = cur.fetchall()
     base.close()
     c = canvas.Canvas(resp)
@@ -132,14 +132,14 @@ def report1(request):
         c.setFillColor(red)
         c.drawString(400, wid, str(el[0]))
         c.setFillColor(black)
-        c.drawString(60, wid-30, "Количество студентов в группе: ")
+        c.drawString(60, wid - 30, "Количество студентов в группе: ")
         c.setFillColor(green)
-        c.drawString(400, wid-30, str(el[1]))
+        c.drawString(400, wid - 30, str(el[1]))
         c.setFillColor(black)
-        c.drawString(60, wid-60, "Количество заданий в группе: ")
+        c.drawString(60, wid - 60, "Количество заданий в группе: ")
         c.setFillColor(green)
-        c.drawString(400, wid-60, str(el[2]))
-        c.line(0, wid-2, 600, wid-2)
+        c.drawString(400, wid - 60, str(el[2]))
+        c.line(0, wid - 2, 600, wid - 2)
         c.showPage()
     c.save()
     return resp
@@ -150,7 +150,8 @@ def report2(request):
     resp['Content_Disposition'] = 'attachment; filename="somefilename.pdf"'
     base = sqlite3.connect("db.sqlite3")
     cur = base.cursor()
-    cur.execute('Select pe_name,  count(CASE WHEN so_res=0 THEN 1 ELSE NULL END),  count(CASE WHEN so_res=5 THEN 1 ELSE NULL END), count(CASE WHEN so_res=10 THEN 1 ELSE NULL END), st_rate from algo_learn_solving inner join algo_learn_student on st_id=so_student_id inner join algo_learn_person on st_profile_id=pe_id inner join algo_learn_problem on so_problem_id=pr_id inner join algo_learn_group on pr_group_id=gr_id Group by pe_name, st_rate')
+    cur.execute(
+        'Select pe_name,  count(CASE WHEN so_res=0 THEN 1 ELSE NULL END),  count(CASE WHEN so_res=5 THEN 1 ELSE NULL END), count(CASE WHEN so_res=10 THEN 1 ELSE NULL END), st_rate from algo_learn_solving inner join algo_learn_student on st_id=so_student_id inner join algo_learn_person on st_profile_id=pe_id inner join algo_learn_problem on so_problem_id=pr_id inner join algo_learn_group on pr_group_id=gr_id Group by pe_name, st_rate')
     res = cur.fetchall()
     base.close()
     c = canvas.Canvas(resp)
@@ -170,11 +171,11 @@ def report2(request):
         c.setFillColor(red)
         c.drawString(400, wid, str(el[0]))
         c.setFillColor(black)
-        c.drawString(60, wid-30, "Количество неправильных решений: ")
+        c.drawString(60, wid - 30, "Количество неправильных решений: ")
         c.setFillColor(green)
-        c.drawString(400, wid-30, str(el[1]))
+        c.drawString(400, wid - 30, str(el[1]))
         c.setFillColor(black)
-        c.drawString(60, wid-60, "Количество наполовину правильных решений: ")
+        c.drawString(60, wid - 60, "Количество наполовину правильных решений: ")
         c.setFillColor(green)
         c.drawString(400, wid - 60, str(el[2]))
         c.setFillColor(black)
@@ -185,8 +186,8 @@ def report2(request):
         c.drawString(60, wid - 120, "Общий балл: ")
 
         c.setFillColor(green)
-        c.drawString(400, wid-120, str(el[4]))
-        c.line(0, wid-2, 600, wid-2)
+        c.drawString(400, wid - 120, str(el[4]))
+        c.line(0, wid - 2, 600, wid - 2)
         c.showPage()
     c.save()
     return resp
@@ -218,7 +219,7 @@ def add(request, pe_id):
     group = Group.objects.get(gr_id=gr_id)
     person = Student.objects.get(st_profile_id=pe_id)
     group.gr_students.add(person)
-    return HttpResponseRedirect('/'.join(request.path.split('/')[:-3])+'/')
+    return HttpResponseRedirect('/'.join(request.path.split('/')[:-3]) + '/')
 
 
 def remove(request, pe_id):
@@ -226,7 +227,7 @@ def remove(request, pe_id):
     group = Group.objects.get(gr_id=gr_id)
     person = Student.objects.get(st_profile_id=pe_id)
     group.gr_students.remove(person)
-    return HttpResponseRedirect('/'.join(request.path.split('/')[:-3])+'/')
+    return HttpResponseRedirect('/'.join(request.path.split('/')[:-3]) + '/')
 
 
 def search_list(word, list):
@@ -235,11 +236,13 @@ def search_list(word, list):
             return True
     return False
 
+
 def search_all_list(word_list, list):
     for el in word_list:
         if not search_list(el, list):
             return False
     return True
+
 
 def search(request):
     people_string = []
@@ -254,7 +257,8 @@ def search(request):
         algos = Algorithm.objects.all()
         groups = Group.objects.all()
         for el in people:
-            pers = [el.pe_name, el.pe_surname, el.pe_patronymic, el.pe_login, el.pe_email, el.pe_status, str(el.pe_birthdate)[:10], str(el.pe_todaydate)[:10]]
+            pers = [el.pe_name, el.pe_surname, el.pe_patronymic, el.pe_login, el.pe_email, el.pe_status,
+                    str(el.pe_birthdate)[:10], str(el.pe_todaydate)[:10]]
             if search_all_list(sent, pers):
                 people_string += [pers]
 
@@ -273,16 +277,19 @@ def search(request):
             if search_all_list(sent, pers):
                 group_string += [pers]
     if len(people_string):
-        people_string = [['Имя', 'Фамилия', 'Отчество', 'Логин', 'Почта', 'Статус', 'Дата рождения','Дата Регистрации']] + people_string
+        people_string = [['Имя', 'Фамилия', 'Отчество', 'Логин', 'Почта', 'Статус', 'Дата рождения',
+                          'Дата Регистрации']] + people_string
     if len(algo_string):
         algo_string = [['Тип', 'Имя', 'Коммментарий']] + algo_string
     if len(group_string):
         group_string = [['Название']] + group_string
     if len(problem_string):
         problem_string = [['Название', 'Дата проверки']] + problem_string
-    if len(people_string +problem_string + algo_string + group_string):
+    if len(people_string + problem_string + algo_string + group_string):
         res = True
-    return render(request, "search.html", {"people_string": people_string, "problem_string": problem_string, "group_string": group_string, "algo_string": algo_string, "res": res})
+    return render(request, "search.html",
+                  {"people_string": people_string, "problem_string": problem_string, "group_string": group_string,
+                   "algo_string": algo_string, "res": res})
 
 
 def editgroup(request, gr_id):
@@ -308,12 +315,14 @@ def problems(request, gr_id):
     solv = Solving.objects.all()
     res = []
     for el in pro:
-        find = Solving.objects.filter(so_problem=el, so_student=Student.objects.filter(st_profile_id=int(request.user.username))[0])
+        find = Solving.objects.filter(so_problem=el,
+                                      so_student=Student.objects.filter(st_profile_id=int(request.user.username))[0])
         if len(find) == 0:
             res += [-1]
         else:
             res += [find[0].so_res]
-    return render(request, "problems.html", {"name": name, "problems": pro, "res": res, "todate": datetime.datetime.now(), "algo": algo})
+    return render(request, "problems.html",
+                  {"name": name, "problems": pro, "res": res, "todate": datetime.datetime.now(), "algo": algo})
 
 
 def editgr_people(request, gr_id):
@@ -429,9 +438,9 @@ def edit(request, pe_id):
             person.pe_surname = request.POST.get("surname")
             person.pe_patronymic = request.POST.get("patronymic")
             person.pe_birthdate = request.POST.get("birthdate")
-            #person.todaydate = request.POST.get("todaydate")
+            # person.todaydate = request.POST.get("todaydate")
             person.pe_login = request.POST.get("login")
-            #person.status = request.POST.get("status")
+            # person.status = request.POST.get("status")
             person.pe_password = request.POST.get("password")
             person.pe_email = request.POST.get("email")
             person.pe_admin = request.POST.get("admin")
@@ -503,7 +512,7 @@ def edittask(request, pr_id):
             task.save()
             return HttpResponseRedirect("/tasknew")
         else:
-            return render(request, "edittask.html", {"task": task,"algo": algo})
+            return render(request, "edittask.html", {"task": task, "algo": algo})
     except Person.DoesNotExist:
         return HttpResponseNotFound("<h2>Task not found</h2>")
 
