@@ -4,3 +4,5 @@
 algo_learn/__pycache__/
 
 *.pyc
+
+venv/
